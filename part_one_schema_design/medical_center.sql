@@ -1,20 +1,23 @@
-﻿CREATE TABLE diseases (
-    id SERIAL PRIMARY KEY,
-    name TEXT   NOT NULL
-);
+﻿
+-- in terminal:
+-- psql < medical_center.sql
+-- psql medical_center
 
+DROP DATABASE IF EXISTS  medical_center;
 
-CREATE TABLE diagnoses (
+CREATE DATABASE medical_center;
+
+\c medical_center
+
+CREATE TABLE diseases (
     id SERIAL PRIMARY KEY,
-    name TEXT NOT NULL,
-    disease_id INTEGER REFERENCES diseases ON DELETE CASCADE
+    name TEXT NOT NULL
 );
 
 CREATE TABLE doctors (
     id SERIAL PRIMARY KEY,
     name TEXT NOT NULL,
-    specialization string NOT NULL,
-    patient_id INTEGER REFERENCES users
+    specialization TEXT NOT NULL
 );
 
 CREATE TABLE patients (
@@ -22,17 +25,29 @@ CREATE TABLE patients (
     name TEXT   NOT NULL,
     date_of_birth DATE,
     doctor_id INTEGER REFERENCES doctors,
-    diagnosis_id INTEGER REFERENCES diagnoses ON DELETE CASCADE,
     disease_id INTEGER REFERENCES diseases ON DELETE CASCADE
 );
 
+CREATE TABLE visits (
+    id SERIAL PRIMARY KEY,
+    visit_date DATE,
+    doctor_id INTEGER REFERENCES doctors ON DELETE SET NULL,
+    patient_id INTEGER REFERENCES patients ON DELETE CASCADE
+);
+
+CREATE TABLE diagnoses (
+    id SERIAL PRIMARY KEY,
+    name TEXT NOT NULL,
+    disease_id INTEGER REFERENCES diseases ON DELETE CASCADE,
+    visit_id INTEGER REFERENCES visits ON DELETE SET NULL
+);
 
 
-
-CREATE INDEX doctor_name ON doctors (name);
-CREATE INDEX patient_name ON patients (name);
-CREATE INDEX diagnosis_name ON diagnoses (name);
-CREATE INDEX disease_name ON diseases (name);
+CREATE INDEX idx_doctor_name ON doctors (name);
+CREATE INDEX idx_patient_name ON patients (name);
+CREATE INDEX idx_diagnosis_name ON diagnoses (name);
+CREATE INDEX idx_disease_name ON diseases (name);
+CREATE INDEX idx_visit_date ON visits (visit_date);
 
 
 
